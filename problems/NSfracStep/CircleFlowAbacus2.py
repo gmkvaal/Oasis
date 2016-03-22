@@ -27,7 +27,7 @@ NS_parameters.update(
     )
 
 def mesh(key,**params): 
-	if key == 1: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM14969E.xml")
+	if key == 1: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM14969E.xml")
 	if key == 2: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM39883E.xml")
 	if key == 3: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM119197E.xml")
 	if key == 4: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM372949Eext.xml")
