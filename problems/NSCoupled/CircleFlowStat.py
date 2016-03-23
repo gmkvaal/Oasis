@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 parameters['allow_extrapolation'] = True
 set_log_active(False)
+from dolfin import *
 #mesh = Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM7169E.xml")
 #mesh = Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM24927E.xml")
 #mesh = Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM94113E.xml")
@@ -14,6 +15,7 @@ NS_parameters.update(
 	d = 0.1,
 	U = 0.2,
 	nu = 0.001,
+
     omega = 1.0,
     max_iter = 1000,
     plot_interval = 10,
@@ -21,14 +23,32 @@ NS_parameters.update(
     CFLwrite = False,
     key=1)
 
-
+"""
 def mesh(key,**params):	
 	if key == 1: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM14969E.xml")
 	if key == 2: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM39883E.xml")
 	if key == 3: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM119197E.xml")
 	if key == 4: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM372949E.xml")
 	if key == 0: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/Old/CFM7169E.xml")
+"""
+"""
+def mesh(key,**params):	
+	if key == 1: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to8ratio/CM531E.xml")
+	if key == 2: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to8ratio/CM1731E.xml")
+	if key == 3: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to8ratio/CM6069E.xml")
+	if key == 4: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to8ratio/CM23757E.xml")
+	if key == 5: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to8ratio/CM94039E.xml")
 
+"""
+def mesh(key,**params):	
+	if key == 1: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to16ratio/CM715E.xml")
+	if key == 2: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to16ratio/CM2256E.xml")
+	if key == 3: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to16ratio/CM8041E.xml")
+	if key == 4: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to16ratio/CM30461E.xml")
+	if key == 5: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to16ratio/CM121589E.xml")
+
+	if key == 10: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/CoarseMesh1.xml")
+	if key == 20: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/CoarseMesh2.xml")
 
 
 
@@ -85,7 +105,7 @@ def create_bcs(VQ,** NS_namespace):
 
 
 
-def theend_hook(mesh, q_, p_, u_, nu, VQ, V, Q, U, d, sys_comp,  key, CFLwrite, **NS_namespace):
+def theend_hook(mesh, q_, p_, u_, u, nu, VQ, V, Q, U, d, sys_comp, up_, key, CFLwrite,AssignedVectorFunction, **NS_namespace):
 
 	pressure = p_
 	boundary = FacetFunction("size_t", mesh)
@@ -98,6 +118,19 @@ def theend_hook(mesh, q_, p_, u_, nu, VQ, V, Q, U, d, sys_comp,  key, CFLwrite, 
 	tau = -pressure*Identity(2)+nu*(grad(u_)+grad(u_).T)
 	forces = -assemble(dot(dot(tau, n), c)*ds(1)).array()*2/U**2/d
 
+
+
+	#plot(u_,interactive=True)
+
+	print u_[0] 
+
+	print ""
+	print ""
+
+
+
+	#f = File("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsStat.pvd")
+	#f << u_[0]
 
 	x_c = np.linspace(0,2.0,1000)
 	u_centercut= zeros(len(x_c))
