@@ -140,7 +140,7 @@ def temporal_hook(mesh, q_,h, u_, T, nu, dt, L_list, D_list, n, ds,  \
 	#print "CFL max %.6f" % max(CFL.vector().array())
 	
 
-def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, CFL_list, \
+def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, \
 				CFLwrite, resultswrite, key, c, ds, p_list, **NS_namespace):
 
 	N = len(L_list)
