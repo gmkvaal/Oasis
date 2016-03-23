@@ -29,14 +29,13 @@ NS_parameters.update(
     )
 
 def mesh(key,**params):
-        if key == 1: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM14969E.xml")
-        if key == 2: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM39883E.xml")
-        if key == 3: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM119197E.xml")
-        if key == 4: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM372949Eext.xml")
-        if key == 10: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFME7169Eext.xml")
-        if key == 20: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM24927Eext.xml")
-        if key == 30: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM94113Eext.xml")
-        if key == 40: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/External/CFM372949Eext.xml")
+        if key == 1: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM14969E.xml")
+        if key == 2: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM39883E.xml")
+        if key == 3: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM119197E.xml")
+        if key == 4: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM372949Eext.xml")
+        if key == 10: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM7169E.xml")
+        if key == 20: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM24927E.xml")
+        if key == 30: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM94113E.xml")
 
 
 
