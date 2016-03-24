@@ -186,13 +186,13 @@ def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, CFL_list,
 				text_file.write("CFL max %.8f \n" % ii)
 
 			CFL_list = []
-	if CFLwrite==True:			
+				
 		CFLfinder(u_,**NS_namespace)
 
 	def writefile(**NS_namespace):
 		import time
 		now = time.strftime("%d/%m/%Y")
-		os.system("/home/guttorm/Desktop/Master/RefinementData/Re100/mkdir OutputCF%s" % now)
+		os.system("mkdir -p /home/guttorm/Desktop/Master/RefinementData/Re100/ OutputCF%s" % now)
 		#os.system("mkdir OutputCF%s" % now)
 		text_file = open("/home/guttorm/Desktop/Master/RefinementData/Re100/OutputCF%s/OutputCircleTest%d.txt" % (now, key), "w")
 		text_file.write("Cl max: %.8f \n" % max(L_list_short))
