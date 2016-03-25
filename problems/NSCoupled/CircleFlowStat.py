@@ -134,7 +134,7 @@ def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV,Q, U, d, \
 		atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
 		os.system("mkdir -p /home/guttorm/Desktop/Master/RefinementData/Re20/Results%s" % atm)
 		identity = mesh.num_cells()
-		text_file = open("/home/guttorm/Desktop/Master/RefinementData/Re20/Results%s/OutputCircleStationary%dE.txt" % (atm,identity), "w")
+		text_file = open("/home/guttorm/Desktop/Master/RefinementData/Re20/Results%s/OutputCircleStationary%d.txt" % (atm,identity), "w")
 		text_file.write("-----Result for %dE-----\n" % identity)
 		text_file.write("Cd max: %.11f \n" % forces[0])
 		text_file.write("Cl max: %.11f \n" % forces[1])
