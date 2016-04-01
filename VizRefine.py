@@ -7,13 +7,14 @@ from mpl_toolkits.mplot3d import Axes3D
 
 
 y = []; ZC = []; ZE = []
-#iterationlist = [1,1.5,2,2.5,3,3.5,4,4.5,5]
+iterationlist = [1,1.5,2,2.5,3,3.5,4,4.5,5]
 #iterationlist = [1,1.5,2,2.5,3]
-iterationlist = [1,2,4]
+#iterationlist = [1,2,3]
 for j in iterationlist:
-	initial_edge = 0.05/j
+	initial_edge = 0.08/j
+	initial_circle=0.01
 	y.append(initial_edge)
-	x,CL_E,Elements = runit(initial_edge=initial_edge,initial_circle=0.005,iterationlist=iterationlist)
+	x,CL_E,Elements = runit(initial_edge=initial_edge,initial_circle=initial_circle,iterationlist=iterationlist)
 	ZC.append(CL_E)
 	ZE.append(Elements)
 
@@ -40,6 +41,6 @@ surf = ax.plot_surface(X,Y,ZE,cstride=1,rstride=1, alpha=0.6, cmap=cm.jet, linew
 fig.colorbar(surf, shrink=0.5, aspect=5)
 ax.set_xlabel('Circle Resolution')
 ax.set_ylabel('Edge Resolution')
-ax.set_zlabel('Cl Error')
+ax.set_zlabel('Elements')
 plt.show()
 
