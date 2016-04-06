@@ -131,7 +131,7 @@ def temporal_hook(mesh, q_,h, u_, T, nu, dt, L_list, D_list, n, ds,  \
 	forces = -assemble(dot(dot(tau, n), c)*ds(1)).array()*2/U**2/d
 
 	if len(forces)==2:
-		comm = mpi_comm_world()
+		#comm = mpi_comm_world()
 		#mpiRank = MPI.rank(comm)
 		#master = mpiRank
 		#print master
