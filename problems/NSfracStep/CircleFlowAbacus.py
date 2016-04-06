@@ -126,6 +126,7 @@ def pre_solve_hook(mesh, **NS_namespace):
 
 def temporal_hook(mesh, q_,h, u_, T, nu, dt, L_list, D_list, n, ds,  \
 			      c, U, d, p_list, master, **NS_namespace):
+
 	pressure = q_['p']
 	tau = -pressure*Identity(2)+nu*(grad(u_)+grad(u_).T)
 	forces = -assemble(dot(dot(tau, n), c)*ds(1)).array()*2/U**2/d

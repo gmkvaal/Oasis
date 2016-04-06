@@ -21,10 +21,10 @@ def runit(initial_edge,initial_circle,iterationlist):
 		circle = initial_circle/i; circlelist.append(circle)
 		os.system("python NSCoupled.py problem=CircleFlowStat \
 					   makemesh=True circle=%f edge=%f resultswrite=True foldername=%s \
-					   element=TaylorHood velocity_degree=3 pressure_degree=2" % (circle,edge,foldername))
+					   element=TaylorHood velocity_degree=2 pressure_degree=1" % (circle,edge,foldername))
 	
 	headers = ["Elements", "h min", "$C_d$", "$C_l$", "$L_a$", r"$\Delta P$"]
-	headers2 = ["Elements", "h min", "$C_l$", "r"]
+	headers2 = ["Elements", "h min", "$C_l$", "Error", "Comp. time", "r"]
 	table = []; h = []; Cl = []; Cl = []; E = []; table2 = []
 	now = datetime.datetime.now()
 	#atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
@@ -46,7 +46,7 @@ def runit(initial_edge,initial_circle,iterationlist):
 			else: 
 				[temp.append(float(num)) for num in number]	
 		table.append(temp[:])
-		table2.append([temp[0],temp[1],temp[3]])
+		table2.append([temp[0],temp[1],temp[3],temp[-1]])
 		h.append(temp[1])
 
 	#print tabulate(table,headers, tablefmt="grid")
@@ -67,17 +67,21 @@ def runit(initial_edge,initial_circle,iterationlist):
 		r_list.append(np.log(Cl_E[i]/Cl_E[i-1])/np.log(h[i]/h[i-1]))
 
 	for i in range(0,len(Cl)):
+		table2[i].insert(3, Cl_E[i])
 		table2[i].append(r_list[i])
 		
 	print tabulate(table2,headers2, tablefmt="latex")
-	print "Convergence rate = %.3f" % alpha
+	print "Convergence rate = %.4f" % alpha
 
 	os.system("rm -r /home/guttorm/Desktop/Master/RefinementData/Re20/%s/*" % atm)
 
 	return circlelist, Cl_E, E
 
-iterationlist = [1,4,8,16]
-initial_edge=0.025; initial_circle=initial_edge
-runit(initial_edge,initial_circle,iterationlist)
-
+"""
+for j in [1,2,4]:
+	
+	iterationlist = [1,4,8,16]
+	initial_edge=0.1/j; initial_circle=initial_edge
+	runit(initial_edge,initial_circle,iterationlist)
+"""
 

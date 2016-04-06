@@ -106,6 +106,7 @@ def start_timestep_hook(t, u_, n, ds, **NS_namespace):
 
 
 def pre_solve_hook(mesh, **NS_namespace):
+	g = 1
 	h = CellSize(mesh)
 	print mesh.hmin()
 	n = FacetNormal(mesh)

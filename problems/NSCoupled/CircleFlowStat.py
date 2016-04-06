@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 parameters['allow_extrapolation'] = True
 set_log_active(False)
 from dolfin import *
+import time
+
+time_start = time.clock()
 
 NS_parameters.update(
 	d = 0.1,
@@ -89,9 +92,10 @@ def create_bcs(VQ,** NS_namespace):
 
 
 
-def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV,Q, U, d, \
+def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV, Q, U, d, \
 				sys_comp, up_, key, plotit, CFLwrite, resultswrite, foldername, **NS_namespace):
 	 
+	comptime = (time.clock() - time_start)
 	pressure = p_
 	boundary = FacetFunction("size_t", mesh)
 	boundary.set_all(0)
@@ -141,11 +145,12 @@ def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV,Q, U, d, \
 		identity = mesh.num_cells()
 		text_file = open("/home/guttorm/Desktop/Master/RefinementData/Re20/%s/OutputCircleStationary%d.txt" % (atm,identity), "w")
 		text_file.write("-----Result for %dE-----\n" % identity)
-		text_file.write("h min = %.11f" % mesh.hmin())
+		text_file.write("h min = %.11f \n" % mesh.hmin())
 		text_file.write("Cd max: %.11f \n" % forces[0])
 		text_file.write("Cl max: %.11f \n" % forces[1])
 		text_file.write("Resirculation length: %.11f \n" % (x_c[min_list[-1]] - x_c[min_list[-2]]))
-		text_file.write("Delta P (front-back): %.11f" % (p_(array([0.15,0.20]))- p_(array([0.25,0.20]))))
+		text_file.write("Delta P (front-back): %.11f \n" % (p_(array([0.15,0.20]))- p_(array([0.25,0.20]))))
+		text_file.write("Computational time:: %.5f" % comptime)
 		text_file.close()
 
 
@@ -154,4 +159,5 @@ def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV,Q, U, d, \
 	print "Cd = {}, CL = {}".format(*forces)
 	print "Resirculation length:%.11f" % (x_c[min_list[-1]] - x_c[min_list[-2]])
 	print "Delta P (front-back): %.11f" % (p_(array([0.15,0.20]))- p_(array([0.25,0.20])))
+	print "Computational time:: %.5f" % comptime
 	print ""
