@@ -6,38 +6,54 @@ import numpy as np
 #from matplotlib import cm
 
 
-y = []; ZC = []; ZE = []
 
-iterationlist = np.linspace(1,8,8)
-#iterationlist = [1,2,4]
-#for j in iterationlist:
-for j in [1,2,4,8]:
-	initial_edge = 0.07/j
-	initial_circle=0.07
-	y.append(initial_edge)
-	x,CL_E,Elements = runit(initial_edge=initial_edge,initial_circle=initial_circle,iterationlist=iterationlist)
-	ZC.append(CL_E)
-	ZE.append(Elements)
+E_matrix=[]; h_matrix=[]; Cd_matrix=[]; y=[]
+Cl_matrix = []; La_matrix=[]; dP_matrix=[]; ct_matrix=[]
+iterationlist = np.linspace(1,4,4)
+circle_list = 0.07/iterationlist
+x = list(circle_list)
+for j in [1,2,4]:
+	edgeres = 0.07/j
+	y.append(edgeres)
+	E, h, Cd, Cl, La, dP, comptime = runit(edgeres,circle_list)
+	E_matrix.append(E)
+	h_matrix.append(h)
+	Cd_matrix.append(Cd)
+	Cl_matrix.append(Cl)
+	La_matrix.append(La)
+	dP_matrix.append(dP)
+	ct_matrix.append(comptime)
 
 
 # Storing the result matrix
 now = datetime.datetime.now()
-identity = len(ZE[0])
+identity = len(Cl)
 atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
 if os.path.isdir("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s" % atm):
-	text_file1 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Cl_E%s.txt" % (atm,identity),"w")
-	text_file2 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/X%s.txt" % (atm,identity),"w")
-	text_file3 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Y%s.txt" % (atm,identity),"w")
+	print "----Path exists, danger of overwriting!----"
 else:
 	os.system("mkdir -p /home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s" % atm)
-	text_file1 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Cl_E%s.txt" % (atm,identity),"w")
-	text_file2 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/X%s.txt" % (atm,identity),"w")
-	text_file3 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Y%s.txt" % (atm,identity),"w")
-text_file1.write(str(ZC))
-text_file2.write(str(x))
-text_file3.write(str(y))
+text_file1 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/1E1_%s.txt" % (atm,identity),"w")
+text_file2 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/2h_%s.txt" % (atm,identity),"w")
+text_file3 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/3Cd_%s.txt" % (atm,identity),"w")
+text_file4 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/4Cl_%s.txt" % (atm,identity),"w")
+text_file5 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/5La_%s.txt" % (atm,identity),"w")
+text_file6 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/6dP_%s.txt" % (atm,identity),"w")
+text_file7 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/7ct_%s.txt" % (atm,identity),"w")
+text_file8 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/8X_%s.txt" % (atm,identity),"w")
+text_file9 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/9Y_%s.txt" % (atm,identity),"w")
+text_file1.write(str(E_matrix))
+text_file2.write(str(h_matrix))
+text_file3.write(str(Cd_matrix))
+text_file4.write(str(Cl_matrix))
+text_file5.write(str(La_matrix))
+text_file6.write(str(dP_matrix))
+text_file7.write(str(ct_matrix))
+text_file8.write(str(x))
+text_file9.write(str(y))
 
 
+"""
 X,Y= np.meshgrid(np.log(np.array(x)),np.log(np.array(y)))
 fig = plt.figure("Cl")
 ax = fig.gca(projection='3d')
@@ -62,4 +78,4 @@ ax.set_xlabel('Circle Resolution')
 ax.set_ylabel('Edge Resolution')
 ax.set_zlabel('Elements')
 plt.show()
-
+"""

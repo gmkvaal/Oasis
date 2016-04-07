@@ -7,26 +7,27 @@ from tabulate import tabulate
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from RefineException import *
 ax = plt.gca()
 
 
 
-def runit(initial_edge,initial_circle,iterationlist):
+def runit(edgeres,circle_list):
 
 	foldername = "TempRes"
-	Cl_reference = 0.0106
-	circlelist = []
 	os.chdir("/home/guttorm/Desktop/Master/Oasis")
-	for i in iterationlist:
-		edge = initial_edge;
-		circle = initial_edge/i; circlelist.append(circle)
-		os.system("python NSCoupled.py problem=CircleFlowStat \
-					   makemesh=True circleres=%f edgeres=%f resultswrite=True foldername=%s \
-					   element=TaylorHood velocity_degree=2 pressure_degree=1" % (circle,edge,foldername))
+	for circleres in circle_list:
+		if circleres <= edgeres:
+			os.system("python NSCoupled.py problem=CircleFlowStat \
+						   makemesh=True circleres=%f edgeres=%f resultswrite=True foldername=%s \
+						   element=TaylorHood velocity_degree=2 pressure_degree=1" % (circleres,edgeres,foldername))
+		else: 
+			exception(foldername,circleres,edgeres)
+			os.chdir("/home/guttorm/Desktop/Master/Oasis")
 	
-	headers = ["Elements", "h min", "$C_d$", "$C_l$", "$L_a$", r"$\Delta P$"]
+	headers = ["Elements", "h min", "$C_d$", "$C_l$", "$L_a$", "$\Delta P$"]
 	headers2 = ["Elements", "h min", "$C_l$", "Error", "Comp. time", "r"]
-	table = []; h = []; Cl = []; Cl = []; E = []; table2 = []
+	table = []; table2 = []; E = []; h = []; Cl = []; Cd = []; L_a = []; dP = []; comptime = []
 	now = datetime.datetime.now()
 	#atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
 	atm = foldername
@@ -48,16 +49,24 @@ def runit(initial_edge,initial_circle,iterationlist):
 			else: 
 				[temp.append(float(num)) for num in number]	
 		table.append(temp[:])
-		table2.append([temp[0],temp[1],temp[3],temp[-1]])
-		h.append(temp[1])
-
-	#print tabulate(table,headers, tablefmt="grid")
+		#table2.append([temp[0],temp[1],temp[3],temp[-1]])
+		#h.append(temp[1])
 	
-	for i in range(len(iterationlist)):
+	for i in range(len(circle_list)):
 		E.append(table[i][0])
+		h.append(table[i][1])
+		Cd.append(table[i][2])
 		Cl.append(table[i][3])
+		L_a.append(table[i][4])
+		dP.append(table[i][5])
+		comptime.append(table[i][6])
 
+
+	"""
 	Cl_E = list(abs(np.array(Cl) - Cl_reference))
+	Cd_E = list(abs(np.array(Cd) - Cd_reference))
+	L_a_E  = list(abs(np.array(L_a) - L_a_reference))
+	dP_E 
 	
 	A = np.vstack([np.log(np.array(h)), np.ones(len(h))]).T 	
 	alpha, c = np.linalg.lstsq(A, np.log(Cl_E))[0]		
@@ -72,12 +81,8 @@ def runit(initial_edge,initial_circle,iterationlist):
 		
 	print tabulate(table2,headers2, tablefmt="latex")
 	print "Convergence rate = %.4f" % alpha
-
+	"""
 	os.system("rm -r /home/guttorm/Desktop/Master/RefinementData/Re20/%s/*" % atm)
 
-	return circlelist, Cl_E, E
+	return E, h, Cd, Cl, L_a, dP, comptime
 
-
-#iterationlist = [1,3,4]
-#initial_edge = 0.1; initial_circle=0.1
-#runit(initial_edge,initial_circle,iterationlist)

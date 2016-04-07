@@ -30,7 +30,13 @@ NS_parameters.update(
 	)
 
 
+
+
 def mesh(makemesh, name, circleres, edgeres, key, **params):
+	print ""
+	"----- Resolutions -----"
+	print "edgeres = %.6f, circleRes = %.6f" % (edgeres, circleres)
+	print ""
 	if makemesh == True:
 		import subprocess
 		os.chdir("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/AutoMesh")
