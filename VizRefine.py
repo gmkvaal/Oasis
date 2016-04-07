@@ -8,12 +8,12 @@ import numpy as np
 
 y = []; ZC = []; ZE = []
 
-iterationlist = np.linspace(1,16,16)
-
+iterationlist = np.linspace(1,8,8)
+#iterationlist = [1,2,4]
 #for j in iterationlist:
-for j in [1,2,4]:
-	initial_edge = 0.05/j
-	initial_circle=0.05
+for j in [1,2,4,8]:
+	initial_edge = 0.07/j
+	initial_circle=0.07
 	y.append(initial_edge)
 	x,CL_E,Elements = runit(initial_edge=initial_edge,initial_circle=initial_circle,iterationlist=iterationlist)
 	ZC.append(CL_E)
@@ -25,13 +25,18 @@ now = datetime.datetime.now()
 identity = len(ZE[0])
 atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
 if os.path.isdir("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s" % atm):
-	text_file = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Cl_E_dimention%s.txt" % (atm,identity),"w")
+	text_file1 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Cl_E%s.txt" % (atm,identity),"w")
+	text_file2 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/X%s.txt" % (atm,identity),"w")
+	text_file3 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Y%s.txt" % (atm,identity),"w")
 else:
 	os.system("mkdir -p /home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s" % atm)
-	text_file = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Cl_E_dimention%s.txt" % (atm,identity),"w")
-text_file.write(str(ZC)+"\n")
-text_file.write(str(x)+"\n")
-text_file.write(str(y))
+	text_file1 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Cl_E%s.txt" % (atm,identity),"w")
+	text_file2 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/X%s.txt" % (atm,identity),"w")
+	text_file3 = open("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s/Y%s.txt" % (atm,identity),"w")
+text_file1.write(str(ZC))
+text_file2.write(str(x))
+text_file3.write(str(y))
+
 
 X,Y= np.meshgrid(np.log(np.array(x)),np.log(np.array(y)))
 fig = plt.figure("Cl")

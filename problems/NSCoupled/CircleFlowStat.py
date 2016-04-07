@@ -21,8 +21,8 @@ NS_parameters.update(
     #velocity_degree = 2,
     CFLwrite = False,
     key=1,
-    circle = 0.2/1,
-	edge = 0.2/1,
+    circleres = 0.2/1,
+	edgeres = 0.2/1,
 	name = "hello",
 	makemesh = False,
 	resultswrite = False,
@@ -30,11 +30,11 @@ NS_parameters.update(
 	)
 
 
-def mesh(makemesh, name, circle, edge, key, **params):
+def mesh(makemesh, name, circleres, edgeres, key, **params):
 	if makemesh == True:
 		import subprocess
 		os.chdir("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/AutoMesh")
-		os.system("python ControlMakeMesh.py %s %f %f" % (name, circle, edge))
+		os.system("python ControlMakeMesh.py %s %f %f" % (name, circleres, edgeres))
 		return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/AutoMesh/CFM%s.xml" % name)
 	else:
 		if key == 1: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to16ratio/CM715E.xml")
@@ -92,7 +92,7 @@ def create_bcs(VQ,** NS_namespace):
 
 
 
-def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV, Q, U, d, \
+def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV, Q, U, d, edgeres, circleres, \
 				sys_comp, up_, key, plotit, CFLwrite, resultswrite, foldername, **NS_namespace):
 	 
 	comptime = (time.clock() - time_start)
@@ -128,13 +128,13 @@ def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV, Q, U, d, \
 	if plotit == True:
 		uu = project(u_,V)
 		now = datetime.datetime.now()
-		identity = mesh.num_cells()
+		elements = mesh.num_cells()
 		atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
 		if os.path.isdir("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s" % atm):
-			f = File("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s/u_from_CircleStat_E%d.pvd" % (atm,identity))
+			f = File("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s/u_Cstat_Circ%.6fEdge%.4fE%d.pvd" % (atm,circleres,edgeres,elements))
 		else:
 			os.system("mkdir -p /home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s" % atm)
-			f = File("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s/u_from_CircleStat_E%d.pvd" % (atm,identity))
+			f = File("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s/u_Cstat_Circ%.6fEdge%.4fE%d.pvd" % (atm,circleres,edgeres,elements))
 		f << uu
 
 	if resultswrite == True:

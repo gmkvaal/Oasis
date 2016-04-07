@@ -6,6 +6,7 @@ import numpy as np
 from tabulate import tabulate
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 ax = plt.gca()
 
 
@@ -18,9 +19,9 @@ def runit(initial_edge,initial_circle,iterationlist):
 	os.chdir("/home/guttorm/Desktop/Master/Oasis")
 	for i in iterationlist:
 		edge = initial_edge;
-		circle = initial_circle/i; circlelist.append(circle)
+		circle = initial_edge/i; circlelist.append(circle)
 		os.system("python NSCoupled.py problem=CircleFlowStat \
-					   makemesh=True circle=%f edge=%f resultswrite=True foldername=%s \
+					   makemesh=True circleres=%f edgeres=%f resultswrite=True foldername=%s \
 					   element=TaylorHood velocity_degree=2 pressure_degree=1" % (circle,edge,foldername))
 	
 	headers = ["Elements", "h min", "$C_d$", "$C_l$", "$L_a$", r"$\Delta P$"]
@@ -35,6 +36,7 @@ def runit(initial_edge,initial_circle,iterationlist):
 	alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
 	list_of_files = sorted(l, key = alphanum_key)
 
+	# Read files and append to right location
 	for resultfile in list_of_files:
 		temp = []
 		f = open(resultfile, 'r')
@@ -51,14 +53,12 @@ def runit(initial_edge,initial_circle,iterationlist):
 
 	#print tabulate(table,headers, tablefmt="grid")
 	
-
 	for i in range(len(iterationlist)):
 		E.append(table[i][0])
 		Cl.append(table[i][3])
 
-	Cl_E = abs(np.array(Cl) - Cl_reference)
-
-	"Error = C * h**alpha"
+	Cl_E = list(abs(np.array(Cl) - Cl_reference))
+	
 	A = np.vstack([np.log(np.array(h)), np.ones(len(h))]).T 	
 	alpha, c = np.linalg.lstsq(A, np.log(Cl_E))[0]		
 
@@ -77,11 +77,7 @@ def runit(initial_edge,initial_circle,iterationlist):
 
 	return circlelist, Cl_E, E
 
-"""
-for j in [1,2,4]:
-	
-	iterationlist = [1,4,8,16]
-	initial_edge=0.1/j; initial_circle=initial_edge
-	runit(initial_edge,initial_circle,iterationlist)
-"""
 
+#iterationlist = [1,3,4]
+#initial_edge = 0.1; initial_circle=0.1
+#runit(initial_edge,initial_circle,iterationlist)
