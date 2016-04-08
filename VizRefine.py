@@ -9,10 +9,10 @@ import numpy as np
 
 E_matrix=[]; h_matrix=[]; Cd_matrix=[]; y=[]
 Cl_matrix = []; La_matrix=[]; dP_matrix=[]; ct_matrix=[]
-iterationlist = np.linspace(1,4,4)
+iterationlist = np.linspace(1,24,24)
 circle_list = 0.07/iterationlist
 x = list(circle_list)
-for j in [1,2,4]:
+for j in [1,2,4,6,8]:
 	edgeres = 0.07/j
 	y.append(edgeres)
 	E, h, Cd, Cl, La, dP, comptime = runit(edgeres,circle_list)
