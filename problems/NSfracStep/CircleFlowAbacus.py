@@ -26,9 +26,12 @@ NS_parameters.update(
     CFLwrite = False,
     resultswrite =False,
     use_krylov_solvers=True,
-    master = 0 	
+    makemesh=True,
+    circleres=0.001,
+    edgeres=0.07,
+    name="AutoMesh"
     )
-
+"""
 def mesh(key,**params):
         if key == 1: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM14969E.xml")
         if key == 2: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM39883E.xml")
@@ -37,8 +40,20 @@ def mesh(key,**params):
         if key == 10: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM7169E.xml")
         if key == 20: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM24927E.xml")
         if key == 30: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM94113E.xml")
-
-
+"""
+def mesh(makemesh, name, circleres, edgeres, key, **params):
+	print ""
+	"----- Resolutions -----"
+	print "edgeres = %.6f, circleRes = %.6f" % (edgeres, circleres)
+	print ""
+	comm = mpi_comm_world()
+        mpiRank = MPI.rank(comm)
+	if mpiRank==0:
+		if makemesh == True:
+			import subprocess
+			os.chdir("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh")
+			os.system("python ControlMakeMesh.py %s %f %f" % (name, circleres, edgeres))
+			return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh/CFM%s.xml" % name)
 
 class Up(SubDomain):
 	def inside(self, x, on_boundary):
