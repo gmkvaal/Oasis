@@ -12,17 +12,17 @@ ax = plt.gca()
 
 
 
-Cdref = 5.5800
-Clref = 0.0106
-Lref  = 0.0847
-dPref = 0.1174
+Cdref = 5.57933281841
+Clref = 0.010618455861
+Lref  = 0.08408408408
+dPref = 0.11752008300
 
 
 results = []
 now = datetime.datetime.now()
 atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
 #os.chdir("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s" % atm)
-os.chdir("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/2016.4.8.10")
+os.chdir("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/2016.4.12.16")
 l = glob.glob('*.txt')
 
 # Sort the files alpabetically and numerically.
@@ -55,6 +55,15 @@ L_E  = list((np.array(La_matrix)-Lref).T)
 dP_E = list((np.array(dP_matrix)-dPref).T)
 
 
+Cl = list((np.array(Cl_matrix)).T)
+Cd = list((np.array(Cd_matrix)).T)
+La = list((np.array(La_matrix)).T)
+dP = list((np.array(dP_matrix)).T)
+
+E_matrix = [list(i) for i in zip(*E_matrix)]
+h_matrix = [list(i) for i in zip(*h_matrix)]
+ct_matrix = [list(i) for i in zip(*ct_matrix)]
+
 
 # Making table
 table = []; headers = [0]
@@ -63,19 +72,21 @@ table = []; headers = [0]
 Cl_E_tab = Cl_E; Cd_E_tab = Cd_E; L_E_tab = L_E; dP_E_tab = dP_E
 
 
-
 for i in range(len(Cl_E)):
-	Cl_E_tab[i] = ["n/a" if ind==0.9894 else ind for ind in Cl_E[i]] 
+	Cl_E_tab[i] = ["n/a" if ind==1-0.010618455861 else ind for ind in Cl_E[i]] 
 	Cl_E_tab[i].insert(0,x[i])
-	Cd_E_tab[i] = ["n/a" if ind==-4.5800 else ind for ind in Cd_E[i]] 
+	Cd_E_tab[i] = ["n/a" if ind==-4.57933281841 else ind for ind in Cd_E[i]] 
 	Cd_E_tab[i].insert(0,x[i])
-	L_E_tab[i] = ["n/a" if ind==0.9153 else ind for ind in L_E[i]] 
+	L_E_tab[i] = ["n/a" if ind==1-0.08408408408 else ind for ind in L_E[i]] 
 	L_E_tab[i].insert(0,x[i])
-	dP_E_tab[i] = ["n/a" if ind==0.8826 else ind for ind in dP_E[i]] 
+	dP_E_tab[i] = ["n/a" if ind==1-0.11752008300 else ind for ind in dP_E[i]] 
 	dP_E_tab[i].insert(0,x[i])
+	E_matrix[i].insert(0,x[i])
+	ct_matrix[i].insert(0,x[i])
 
 
-tables = dP_E_tab
+# tables = what to view
+tables = Cl_E_tab
 print tabulate(tables,headers, tablefmt="grid")
 
 

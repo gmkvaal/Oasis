@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from RefineException import *
 ax = plt.gca()
-
+import time
 
 
 def runit(edgeres,circle_list):
@@ -24,6 +24,8 @@ def runit(edgeres,circle_list):
 		else: 
 			exception(foldername,circleres,edgeres)
 			os.chdir("/home/guttorm/Desktop/Master/Oasis")
+
+		#time.sleep(1) # delays for 1 second
 	
 	headers = ["Elements", "h min", "$C_d$", "$C_l$", "$L_a$", "$\Delta P$"]
 	headers2 = ["Elements", "h min", "$C_l$", "Error", "Comp. time", "r"]

@@ -108,7 +108,6 @@ def start_timestep_hook(t, u_, n, ds, **NS_namespace):
 def pre_solve_hook(mesh, **NS_namespace):
 	g = 1
 	h = CellSize(mesh)
-	print mesh.hmin()
 	n = FacetNormal(mesh)
 	boundary = FacetFunction("size_t", mesh)
 	boundary.set_all(0)
@@ -135,7 +134,7 @@ def temporal_hook(t, mesh, q_,h, u_, T, nu, dt, plot_interval, \
 	D_list.append(forces[0])
 	print "Cd = {}, CL = {}".format(*forces)
 	p_list.append(pressure(array([0.15,0.20]))-pressure(array([0.25,0.20])))
-
+	print pressure(array([0.15,0.20]))-pressure(array([0.25,0.20]))
 	#DG = FunctionSpace(mesh, "DG", 0)
 	#CFL = project((dot(u_,u_)**0.5)*dt/h, DG)
 	#print "CFL max %.6f" % max(CFL.vector().array())
