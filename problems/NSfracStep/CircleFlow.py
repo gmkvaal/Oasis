@@ -21,7 +21,6 @@ NS_parameters.update(
     print_intermediate_info = 100,
     L_list = [],
     D_list = [],
-    CFL_list = [],
     p_list=[],
     key = 1,
     CFLwrite = False,
@@ -125,7 +124,7 @@ def pre_solve_hook(mesh, **NS_namespace):
 
 
 def temporal_hook(t, mesh, q_,h, u_, T, nu, dt, plot_interval, \
-			      tstep, sys_comp, L_list, D_list, CFL_list, n, ds,  \
+			      tstep, sys_comp, L_list, D_list, n, ds,  \
 			      c, U, d,p_list, **NS_namespace):
 	pressure = q_['p']
 	tau = -pressure*Identity(2)+nu*(grad(u_)+grad(u_).T)
@@ -140,7 +139,7 @@ def temporal_hook(t, mesh, q_,h, u_, T, nu, dt, plot_interval, \
 	#print "CFL max %.6f" % max(CFL.vector().array())
 	
 
-def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, CFL_list, \
+def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, \
 				CFLwrite, resultswrite, key, c, ds, p_list, **NS_namespace):
 
 	N = len(L_list)
@@ -148,7 +147,6 @@ def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, CFL_list,
 	DG = FunctionSpace(mesh, "DG", 0)
 	L_list_short = array(L_list[Nn:])
 	D_list_short = array(D_list[Nn:])
-	CFL_list_short = array(CFL_list[Nn:])
 	p_list_short = array(p_list[Nn:])
 	max_list = []; min_list = []
 	for j in range(0,(len(L_list_short)-2)):
