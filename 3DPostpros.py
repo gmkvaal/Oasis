@@ -11,7 +11,7 @@ from mpl_toolkits.mplot3d import Axes3D
 ax = plt.gca()
 
 
-
+# Ref: Circle 0.0001 Edge 0.01
 Cdref = 5.57933281841
 Clref = 0.010618455861
 Lref  = 0.08408408408
@@ -22,7 +22,7 @@ results = []
 now = datetime.datetime.now()
 atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
 #os.chdir("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/%s" % atm)
-os.chdir("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/2016.4.12.16")
+os.chdir("/home/guttorm/Desktop/Master/RefinementData/Re20/2Dref/2016.4.13.13")
 l = glob.glob('*.txt')
 
 # Sort the files alpabetically and numerically.
@@ -55,10 +55,16 @@ L_E  = list((np.array(La_matrix)-Lref).T)
 dP_E = list((np.array(dP_matrix)-dPref).T)
 
 
-Cl = list((np.array(Cl_matrix)).T)
-Cd = list((np.array(Cd_matrix)).T)
-La = list((np.array(La_matrix)).T)
-dP = list((np.array(dP_matrix)).T)
+#Cl_tab = list((np.array(Cl_matrix)).T)
+#Cd_tab = list((np.array(Cd_matrix)).T)
+#La_tab = list((np.array(La_matrix)).T)
+#dP_tab = list((np.array(dP_matrix)).T)
+
+
+Cl_tab = [list(i) for i in zip(*Cl_matrix)]
+Cd_tab = [list(i) for i in zip(*Cd_matrix)]
+La_tab = [list(i) for i in zip(*La_matrix)]
+dP_tab = [list(i) for i in zip(*dP_matrix)]
 
 E_matrix = [list(i) for i in zip(*E_matrix)]
 h_matrix = [list(i) for i in zip(*h_matrix)]
@@ -73,21 +79,29 @@ Cl_E_tab = Cl_E; Cd_E_tab = Cd_E; L_E_tab = L_E; dP_E_tab = dP_E
 
 
 for i in range(len(Cl_E)):
-	Cl_E_tab[i] = ["n/a" if ind==1-0.010618455861 else ind for ind in Cl_E[i]] 
+	Cl_E_tab[i] = [ '%.4e' % elem for elem in Cl_E_tab[i] ]
+	Cl_E_tab[i] = ["n/a" if ind==9.8938e-01 else ind for ind in Cl_E[i]] 
 	Cl_E_tab[i].insert(0,x[i])
+	Cd_E_tab[i] = [ '%.4e' % elem for elem in Cd_E_tab[i] ]
 	Cd_E_tab[i] = ["n/a" if ind==-4.57933281841 else ind for ind in Cd_E[i]] 
 	Cd_E_tab[i].insert(0,x[i])
+	L_E_tab[i] = [ '%.4e' % elem for elem in L_E_tab[i] ]
 	L_E_tab[i] = ["n/a" if ind==1-0.08408408408 else ind for ind in L_E[i]] 
 	L_E_tab[i].insert(0,x[i])
+	dP_E_tab[i] = [ '%.4e' % elem for elem in dP_E_tab[i] ]
 	dP_E_tab[i] = ["n/a" if ind==1-0.11752008300 else ind for ind in dP_E[i]] 
 	dP_E_tab[i].insert(0,x[i])
 	E_matrix[i].insert(0,x[i])
 	ct_matrix[i].insert(0,x[i])
-
+	Cl_tab[i].insert(0,x[i])
+	Cd_tab[i].insert(0,x[i])
+	La_tab[i].insert(0,x[i])
+	dP_tab[i].insert(0,x[i])
 
 # tables = what to view
-tables = Cl_E_tab
-print tabulate(tables,headers, tablefmt="grid")
+#Cl_E_tab = [ '%.2f' % elem for elem in Cl_E_tab ]
+tables = ct_matrix
+print tabulate(tables,headers, tablefmt="latex", floatfmt=".3e")
 
 
 plot_it = False

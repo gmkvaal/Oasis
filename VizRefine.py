@@ -9,7 +9,7 @@ import numpy as np
 
 E_matrix=[]; h_matrix=[]; Cd_matrix=[]; y=[]
 Cl_matrix = []; La_matrix=[]; dP_matrix=[]; ct_matrix=[]
-iterationlist = np.linspace(1,50,25)
+iterationlist = np.linspace(1,100,25)
 circle_list = 0.07/iterationlist
 x = list(circle_list)
 for j in [1,2,4,6,8]:
