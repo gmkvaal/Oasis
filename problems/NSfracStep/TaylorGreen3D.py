@@ -51,13 +51,14 @@ constrained_domain = PeriodicDomain()
 
 # Override some problem specific parameters
 recursive_update(NS_parameters, dict(
-    nu = 0.005,
+    nu = 2*pi/1000,
     T = 0.2,
     dt = 0.01,
     Nx = 33,
     Ny = 33, 
     Nz = 33,
     folder = "taylorgreen3D_results",
+    rho = 1,
     max_iter = 1,
     velocity_degree = 1,
     save_step = 10000,
@@ -65,6 +66,7 @@ recursive_update(NS_parameters, dict(
     plot_interval = 10,
     print_dkdt_info = 10000,
     use_krylov_solvers = True,
+    kinlist = []
     krylov_solvers = dict(monitor_convergence=True)
   )
 )
@@ -86,24 +88,11 @@ def initialize(q_, q_1, q_2, VV, initial_fields, OasisFunction, **NS_namespace):
 
 kin = zeros(1)
 def temporal_hook(u_, p_, tstep, plot_interval, print_dkdt_info, nu, 
-                  dt, t, oasis_memory, **NS_namespace):
-    oasis_memory("tmp", True)
-    if (tstep % print_dkdt_info == 0 or
-        tstep % print_dkdt_info == 1):
-        kinetic = assemble(0.5*dot(u_, u_)*dx) / (2*pi)**3
-        if tstep % print_dkdt_info == 0:
-            kin[0] = kinetic
-            dissipation = assemble(nu*inner(grad(u_), grad(u_))*dx) / (2*pi)**3
-            info_blue("Kinetic energy = {} at time = {}".format(kinetic, t)) 
-            info_blue("Energy dissipation rate = {}".format(dissipation))
-        else:
-            info_blue("dk/dt = {} at time = {}".format((kinetic-kin[0])/dt, t))
+                  dt, t, oasis_memory, kinlist,**NS_namespace):
+    
+    kinetic = assemble(0.5*dot(u_, u_)*dx) / (2*pi)**3
+    kinlist.append(kinetic)
 
-    if tstep % plot_interval == 0:
-        plot(p_, title='pressure')
-        plot(u_[0], title='velocity-x')
-        plot(u_[1], title='velocity-y')
-        
-def theend_hook(u_, p_ ,**kw):
-    pass
+def theend_hook(u_, p_ ,kinlist,**kw):
+    np.savetxt('kinetic_reference.txt', kinetic, delimiter=',')
 
