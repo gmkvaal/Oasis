@@ -8,11 +8,11 @@ from ..NSfracStep import *
 # Override some problem specific parameters
 NS_parameters.update(
     nu = 0.01,
-    T = 1.,
+    T = 4.,
     dt = 0.001,
     Nx = 20, Ny = 20,
     folder = "taylorgreen2D_results",
-    plot_interval = 1000,
+    plot_interval = 100,
     save_step = 10000,
     checkpoint = 10000,
     print_intermediate_info = 1000,
