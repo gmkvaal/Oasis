@@ -5,6 +5,8 @@ __license__  = "GNU Lesser GPL version 3 or any later version"
 
 from ..NSfracStep import *
 import numpy as np
+import datetime
+set_log_active(False)
 
 def mesh(Nx, Ny, Nz, **params):
     return BoxMesh(Point(-pi, -pi, -pi), Point(pi, pi, pi), Nx, Ny, Nz)
@@ -51,7 +53,8 @@ class PeriodicDomain(SubDomain):
 constrained_domain = PeriodicDomain()
 
 # Override some problem specific parameters
-recursive_update(NS_parameters, dict(
+#recursive_update(NS_parameters, dict(
+NS_parameters.update(
     nu = 2*pi/1000,
     T = 20,
     dt = 0.001,
@@ -61,16 +64,16 @@ recursive_update(NS_parameters, dict(
     folder = "taylorgreen3D_results",
     rho = 1,
     max_iter = 1,
-    velocity_degree = 1,
+    velocity_degree = 2,
+    pressure_degree = 1,
     save_step = 10000,
     checkpoint = 10000, 
     plot_interval = 10,
     print_dkdt_info = 10000,
     use_krylov_solvers = True,
     kinlist = [],
-    krylov_solvers = dict(monitor_convergence=True)
-  )
-)
+    krylov_solvers = dict(monitor_convergence=False)
+    )
 
 initial_fields = dict(
         u0='sin(x[0])*cos(x[1])*cos(x[2])',
@@ -78,7 +81,8 @@ initial_fields = dict(
         u2='0',
         p='1./16.*(cos(2*x[0])+cos(2*x[1]))*(cos(2*x[2])+2)')
     
-def initialize(q_, q_1, q_2, VV, initial_fields, OasisFunction, **NS_namespace):
+def initialize(q_, q_1, q_2, VV, V, Q, initial_fields, OasisFunction, **NS_namespace):
+    print "DOF = %d" % int(V.dim() + Q.dim())
     for ui in q_:
         vv = OasisFunction(Expression((initial_fields[ui])), VV[ui])
         vv()
@@ -96,5 +100,7 @@ def temporal_hook(u_, p_, tstep, plot_interval, print_dkdt_info, nu,
 
 def theend_hook(u_, p_ ,kinlist,**kw):
     if MPI.rank(mpi_comm_world()) == 0:
-        np.savetxt('/home/guttorm/Desktop/Master/TaylorGreen/ReferenceResults/kinetic_reference.txt', kinlist, delimiter=',')
+        now = datetime.datetime.now()
+        atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
+        np.savetxt('/home/guttorm/Desktop/Master/TaylorGreen/ReferenceResults/kinetic_reference%satm.txt %atm', kinlist, delimiter=',')
 
