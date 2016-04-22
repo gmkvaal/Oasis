@@ -1,0 +1,45 @@
+import os
+
+
+
+for key in [004,002,001,0005,00025]:
+	os.system("python NSfracStep.py problem=CircleFlowAbacus resultswrite=True T=8 key=%s"  % (key))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
