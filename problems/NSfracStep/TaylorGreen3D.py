@@ -4,6 +4,7 @@ __copyright__ = "Copyright (C) 2013 " + __author__
 __license__  = "GNU Lesser GPL version 3 or any later version"
 
 from ..NSfracStep import *
+import numpy as np
 
 def mesh(Nx, Ny, Nz, **params):
     return BoxMesh(Point(-pi, -pi, -pi), Point(pi, pi, pi), Nx, Ny, Nz)
@@ -52,8 +53,8 @@ constrained_domain = PeriodicDomain()
 # Override some problem specific parameters
 recursive_update(NS_parameters, dict(
     nu = 2*pi/1000,
-    T = 0.2,
-    dt = 0.01,
+    T = 20,
+    dt = 0.001,
     Nx = 33,
     Ny = 33, 
     Nz = 33,
@@ -66,7 +67,7 @@ recursive_update(NS_parameters, dict(
     plot_interval = 10,
     print_dkdt_info = 10000,
     use_krylov_solvers = True,
-    kinlist = []
+    kinlist = [],
     krylov_solvers = dict(monitor_convergence=True)
   )
 )
@@ -95,5 +96,5 @@ def temporal_hook(u_, p_, tstep, plot_interval, print_dkdt_info, nu,
 
 def theend_hook(u_, p_ ,kinlist,**kw):
     if MPI.rank(mpi_comm_world()) == 0:
-        np.savetxt('kinetic_reference.txt', kinetic, delimiter=',')
+        np.savetxt('/home/guttorm/Desktop/Master/TaylorGreen/ReferenceResults/kinetic_reference.txt', kinlist, delimiter=',')
 
