@@ -86,7 +86,7 @@ def initialize(q_, q_1, q_2, VV, initial_fields, OasisFunction, **NS_namespace):
             q_1[ui].vector()[:] = q_[ui].vector()[:]
             q_2[ui].vector()[:] = q_[ui].vector()[:]
 
-kin = zeros(1)
+
 def temporal_hook(u_, p_, tstep, plot_interval, print_dkdt_info, nu, 
                   dt, t, oasis_memory, kinlist,**NS_namespace):
     
@@ -94,5 +94,6 @@ def temporal_hook(u_, p_, tstep, plot_interval, print_dkdt_info, nu,
     kinlist.append(kinetic)
 
 def theend_hook(u_, p_ ,kinlist,**kw):
-    np.savetxt('kinetic_reference.txt', kinetic, delimiter=',')
+    if MPI.rank(mpi_comm_world()) == 0:
+        np.savetxt('kinetic_reference.txt', kinetic, delimiter=',')
 
