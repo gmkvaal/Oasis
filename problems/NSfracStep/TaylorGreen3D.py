@@ -102,5 +102,5 @@ def theend_hook(u_, p_ ,kinlist,**kw):
     if MPI.rank(mpi_comm_world()) == 0:
         now = datetime.datetime.now()
         atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
-        np.savetxt('/uio/hume/student-u61/gmkvaal/Master/TaylorGreenkinetic_reference%s.txt' % atm, kinlist, delimiter=',')
+        np.savetxt('/uio/hume/student-u61/gmkvaal/Master/TaylorGreen/ReferenceResults/kinetic_reference%s.txt' % atm, kinlist, delimiter=',')
 
