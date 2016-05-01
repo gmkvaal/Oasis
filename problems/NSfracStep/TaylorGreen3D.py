@@ -1,4 +1,4 @@
-__author__ = "Mikael Mortensen <mikaem@math.uio.no>"
+å__author__ = "Mikael Mortensen <mikaem@math.uio.no>"
 __date__ = "2013-06-25"
 __copyright__ = "Copyright (C) 2013 " + __author__
 __license__  = "GNU Lesser GPL version 3 or any later version"
@@ -55,7 +55,7 @@ constrained_domain = PeriodicDomain()
 # Override some problem specific parameters
 #recursive_update(NS_parameters, dict(
 NS_parameters.update(
-    nu = 2*pi/1000,
+    nu = 1./1000,
     T = 20,
     dt = 0.001,
     Nx = 33,
