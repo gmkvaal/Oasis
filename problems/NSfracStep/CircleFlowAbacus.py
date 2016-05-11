@@ -31,15 +31,15 @@ NS_parameters.update(
     name = "Auto" 	
     )
 
-def mesh(makemesh, name, circleres, edgeres, **params):
+def mesh(name, circleres, edgeres, **params):
 	print ""
-	"----- Resolutions -----"
+	print "----- Resolutions -----"
 	print "edgeres = %.6f, circleRes = %.6f" % (edgeres, circleres)
 	print ""
 	comm = mpi_comm_world()
         mpiRank = MPI.rank(comm)
 	if mpiRank==0:
-		if makemesh == True:
+
 			import subprocess
 			os.chdir("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh")
 			os.system("python ControlMakeMesh.py %s %f %f" % (name, circleres, edgeres))
@@ -133,7 +133,7 @@ def pre_solve_hook(mesh, **NS_namespace):
 
 
 def temporal_hook(mesh, q_,h, u_, T, nu, dt, L_list, D_list, n, ds,  \
-			      c, U, d, p_list, master, **NS_namespace):
+			      c, U, d, p_list, **NS_namespace):
 	pressure = q_['p']
 	tau = -pressure*Identity(2)+nu*(grad(u_)+grad(u_).T)
 	forces = -assemble(dot(dot(tau, n), c)*ds(1)).array()*2/U**2/d
@@ -153,8 +153,8 @@ def temporal_hook(mesh, q_,h, u_, T, nu, dt, L_list, D_list, n, ds,  \
 	#print "CFL max %.6f" % max(CFL.vector().array())
 	#return dict(master=master)
 
-def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, master, \
-				CFLwrite, resultswrite, key, c, ds, p_list, **NS_namespace):
+def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, \
+				CFLwrite, resultswrite, key, c, ds, p_list, circleres, edgeres, **NS_namespace):
 		
 	if len(L_list) > 1:
 		print "first stage passed"
@@ -204,25 +204,23 @@ def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, master, \
 		if CFLwrite==True:
 			CFLfinder(u_,**NS_namespace)
 
-		def writefile(**NS_namespace):
+		if resultswrite==True:
+			
 			import datetime
 			now = datetime.datetime.now()
-			atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
+			atm = "%d.%d.%d" % (now.month, now.day, now.hour)
+			
 			os.system("mkdir -p /uio/hume/student-u61/gmkvaal/Master/RefinementData/Re100/OutputCF%s" % atm)
-			text_file = open("/uio/hume/student-u61/gmkvaal/Master/RefinementData/Re100/OutputCF%s/OutputCircleTest%d.txt" % (atm, key), "w")
+			text_file = open("/uio/hume/student-u61/gmkvaal/Master/RefinementData/Re100/OutputCF%s/OutputCircle%fEdge%f.txt" % (atm, circleres, edgeres), "w")
 			text_file.write("Cl max: %.8f \n" % max(L_list_short))
 			text_file.write("Cd max: %.8f \n" % max(D_list_short))
 			text_file.write("Cl min: %.8f \n" % min(L_list_short))
 			text_file.write("Cd min: %.8f \n" % min(D_list_short))
-			text_file.write("St = %.8f") % f
-			text_file.write("Delta P = %.8f") % p_list_short[min_list[-1]]
+			text_file.write("St = %.8f" % f)
+			text_file.write("Delta P = %.8f" % p_list_short[min_list[-1]])
 			text_file.close()
 
-		
-		if resultswrite==True:	
-			writefile(**NS_namespace)
-
-		print "----------Results---------"		print "Cl max=%.6f" % max(L_list_short)
+		print "----------Results--------"
 		print "Cd max=%.6f" % max(D_list_short)
 		print "Cl min=%.6f" % min(L_list_short)
 		print "Cd min=%.6f" % min(D_list_short)
@@ -234,4 +232,4 @@ def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, master, \
                         writefile(**NS_namespace)
 
 
-	else:		print "No information on this process"
+	else:	print "No information on this process"
