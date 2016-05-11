@@ -31,6 +31,7 @@ NS_parameters.update(
     name = "Auto" 	
     )
 
+"""
 def mesh(name, circleres, edgeres, **params):
 	print ""
 	print "----- Resolutions -----"
@@ -45,8 +46,10 @@ def mesh(name, circleres, edgeres, **params):
 			os.system("python ControlMakeMesh.py %s %f %f" % (name, circleres, edgeres))
 			return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh/CFM%s.xml" % name)
 
+"""
 
-
+def mesh(name, **params):
+	return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh/name" % name)
 
 class Up(SubDomain):
 	def inside(self, x, on_boundary):
