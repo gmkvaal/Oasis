@@ -26,17 +26,25 @@ NS_parameters.update(
     CFLwrite = False,
     resultswrite =False,
     use_krylov_solvers=True,
-    master = 0 	
+    circleres = 0.01,
+    edgeres = 0.035,
+    name = "Auto" 	
     )
 
-def mesh(key,**params):
-        if key == 1: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM14969E.xml")
-        if key == 2: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM39883E.xml")
-        if key == 3: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM119197E.xml")
-        if key == 4: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM372949E.xml")
-        if key == 10: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM7169E.xml")
-        if key == 20: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM24927E.xml")
-        if key == 30: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM94113E.xml")
+def mesh(makemesh, name, circleres, edgeres, **params):
+	print ""
+	"----- Resolutions -----"
+	print "edgeres = %.6f, circleRes = %.6f" % (edgeres, circleres)
+	print ""
+	comm = mpi_comm_world()
+        mpiRank = MPI.rank(comm)
+	if mpiRank==0:
+		if makemesh == True:
+			import subprocess
+			os.chdir("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh")
+			os.system("python ControlMakeMesh.py %s %f %f" % (name, circleres, edgeres))
+			return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh/CFM%s.xml" % name)
+
 
 
 
@@ -126,13 +134,12 @@ def pre_solve_hook(mesh, **NS_namespace):
 
 def temporal_hook(mesh, q_,h, u_, T, nu, dt, L_list, D_list, n, ds,  \
 			      c, U, d, p_list, master, **NS_namespace):
-
 	pressure = q_['p']
 	tau = -pressure*Identity(2)+nu*(grad(u_)+grad(u_).T)
 	forces = -assemble(dot(dot(tau, n), c)*ds(1)).array()*2/U**2/d
 
 	if len(forces)==2:
-		#comm = mpi_comm_world()
+		comm = mpi_comm_world()
 		#mpiRank = MPI.rank(comm)
 		#master = mpiRank
 		#print master
@@ -215,8 +222,7 @@ def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, master, \
 		if resultswrite==True:	
 			writefile(**NS_namespace)
 
-		print "----------Results----------"
-		print "Cl max=%.6f" % max(L_list_short)
+		print "----------Results---------"		print "Cl max=%.6f" % max(L_list_short)
 		print "Cd max=%.6f" % max(D_list_short)
 		print "Cl min=%.6f" % min(L_list_short)
 		print "Cd min=%.6f" % min(D_list_short)
