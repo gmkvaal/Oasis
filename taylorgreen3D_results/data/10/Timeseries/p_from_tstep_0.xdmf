@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<Xdmf Version="2.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Domain>
+    <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">
+      <Time TimeType="List">
+        <DataItem Format="XML" Dimensions="2"> 10000 20000</DataItem>
+      </Time>
+      <Grid Name="grid_1" GridType="Uniform">
+        <Topology NumberOfElements="215622" TopologyType="Tetrahedron">
+          <DataItem Format="HDF" Dimensions="215622 4">p_from_tstep_0.h5:/Mesh/0/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XYZ">
+          <DataItem Format="HDF" Dimensions="39304 3">p_from_tstep_0.h5:/Mesh/0/coordinates</DataItem>
+        </Geometry>
+        <Attribute Name="p" AttributeType="Scalar" Center="Node">
+          <DataItem Format="HDF" Dimensions="39304 1">p_from_tstep_0.h5:/VisualisationVector/0</DataItem>
+        </Attribute>
+      </Grid>
+      <Grid Name="grid_2" GridType="Uniform">
+        <Topology NumberOfElements="215622" TopologyType="Tetrahedron">
+          <DataItem Format="HDF" Dimensions="215622 4">p_from_tstep_0.h5:/Mesh/0/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XYZ">
+          <DataItem Format="HDF" Dimensions="39304 3">p_from_tstep_0.h5:/Mesh/0/coordinates</DataItem>
+        </Geometry>
+        <Attribute Name="p" AttributeType="Scalar" Center="Node">
+          <DataItem Format="HDF" Dimensions="39304 1">p_from_tstep_0.h5:/VisualisationVector/1</DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>
