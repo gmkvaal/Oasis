@@ -1,8 +1,5 @@
-uthor__ = "Mikael Mortensen <mikaem@math.uio.no>"
-__date__ = "2013-06-25"
-__copyright__ = "Copyright (C) 2013 " + __author__
-__license__  = "GNU Lesser GPL version 3 or any later version"
 
+import numpy as np
 from ..NSfracStep import *
 
 def mesh(Nx, Ny, Nz, **params):
@@ -51,23 +48,25 @@ constrained_domain = PeriodicDomain()
 
 # Override some problem specific parameters
 recursive_update(NS_parameters, dict(
-    nu = 0.005,
-    T = 0.2,
-    dt = 0.01,
-    Nx = 33,
-    Ny = 33, 
-    Nz = 33,
+    nu = 1./1000,
+    rho = 1,
+    T = 10,
+    dt = 0.001,
+    Nx = 10,
+    Ny = 10, 
+    Nz = 10,
     folder = "taylorgreen3D_results",
     max_iter = 1,
-    velocity_degree = 1,
+    velocity_degree = 2,
+    pressure_degree = 1,
     save_step = 10000,
     checkpoint = 10000, 
-    plot_interval = 10,
-    print_dkdt_info = 10000,
+    plot_interval = 100000,
+    print_dkdt_info = 10,
     use_krylov_solvers = True,
     kinlist = [],
     dkdtlist = [],
-    krylov_solvers = dict(monitor_convergence=True)
+    krylov_solvers = dict(monitor_convergence=False)
   )
 )
 
@@ -89,25 +88,40 @@ def initialize(q_, q_1, q_2, VV, initial_fields, OasisFunction, **NS_namespace):
 kin = zeros(1)
 def temporal_hook(u_, p_, tstep, plot_interval, print_dkdt_info, nu, 
                   dt, t, oasis_memory,kinlist,dkdtlist, **NS_namespace):
-    oasis_memory("tmp", True)
+    #oasis_memory("tmp", True)
     if (tstep % print_dkdt_info == 0 or
         tstep % print_dkdt_info == 1):
         kinetic = assemble(0.5*dot(u_, u_)*dx) / (2*pi)**3
         if tstep % print_dkdt_info == 0:
             kin[0] = kinetic
-	    kinlist.append(kinetic)
+            kinlist.append(kinetic)
+            info_blue("K = {}".format(kinetic))
             #dissipation = assemble(nu*inner(grad(u_), grad(u_))*dx) / (2*pi)**3
-            
         else:
             info_blue("dk/dt = {} at time = {}".format((kinetic-kin[0])/dt, t))
-	    dkdtlist.append((kinetic-kin[0])/dt)
+            dkdtlist.append(abs((kinetic-kin[0])/dt))
 
             
-def theend_hook(dkdtlist, kinlist,**kw):
+def theend_hook(dkdtlist, kinlist, Nx, nu, dt, **kw):
     if MPI.rank(mpi_comm_world()) == 0:
+        import datetime
         now = datetime.datetime.now()
         atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
-        np.savetxt('/uio/hume/student-u61/gmkvaal/Master/TaylorGreen/ReferenceResults/k_ref%sdt%snu%sN%s.txt' \
+
+        """
+        np.savetxt('/home/guttorm/Desktop/Master/TaylorGreen/ReferenceResults/k_ref%sdt%snu%sN%s.txt' \
             % (atm,dt,nu,Nx), kinlist, delimiter=',')
+        np.savetxt('/home/guttorm/Desktop/Master/TaylorGreen/ReferenceResults/dkdt_ref%sdt%snu%sN%s.txt' \
+            % (atm,dt,nu,Nx), kinlist, delimiter=',')
+        """
+
+        np.savetxt('/home/guttorm/Desktop/Master/TaylorGreen/ReferenceResults/k_ref%sdt%snu%sN%s.txt' \
+            % (atm,dt,nu,Nx), kinlist, delimiter=',')
+        np.savetxt('/home/guttorm/Desktop/Master/TaylorGreen/ReferenceResults/dkdt_ref%sdt%snu%sN%s.txt' \
+            % (atm,dt,nu,Nx), kinlist, delimiter=',')
+
+
+
+
 
 
