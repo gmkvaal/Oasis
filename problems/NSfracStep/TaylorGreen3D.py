@@ -56,20 +56,20 @@ constrained_domain = PeriodicDomain()
 #recursive_update(NS_parameters, dict(
 NS_parameters.update(
     nu = 1./1000,
-    T = 20,
-    dt = 0.001,
-    Nx = 33,
-    Ny = 33, 
-    Nz = 33,
+    T = 10,
+    dt = 0.0005,
+    Nx = 32,
+    Ny = 32, 
+    Nz = 32,
     folder = "taylorgreen3D_results",
     rho = 1,
-    max_iter = 1,
+    max_iter = 10000,
     velocity_degree = 2,
     pressure_degree = 1,
     save_step = 10000,
     checkpoint = 10000, 
-    plot_interval = 10,
-    print_dkdt_info = 10000,
+    plot_interval = 100000,
+    print_dkdt_info = 100000,
     use_krylov_solvers = True,
     kinlist = [],
     krylov_solvers = dict(monitor_convergence=False)
@@ -98,9 +98,10 @@ def temporal_hook(u_, p_, tstep, plot_interval, print_dkdt_info, nu,
     kinetic = assemble(0.5*dot(u_, u_)*dx) / (2*pi)**3
     kinlist.append(kinetic)
 
-def theend_hook(u_, p_ ,kinlist,**kw):
+def theend_hook(u_, p_ ,dt, nu, Nx, kinlist,**kw):
     if MPI.rank(mpi_comm_world()) == 0:
         now = datetime.datetime.now()
         atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
-        np.savetxt('/uio/hume/student-u61/gmkvaal/Master/TaylorGreen/ReferenceResults/kinetic_reference%s.txt' % atm, kinlist, delimiter=',')
+        np.savetxt('/uio/hume/student-u61/gmkvaal/Master/TaylorGreen/ReferenceResults/k_ref%sdt%snu%sN%s.txt' \
+            % (atm,dt,nu,Nx), kinlist, delimiter=',')
 
