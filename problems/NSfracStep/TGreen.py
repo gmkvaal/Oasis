@@ -52,9 +52,9 @@ recursive_update(NS_parameters, dict(
     rho = 1,
     T = 10,
     dt = 0.001,
-    Nx = 10,
-    Ny = 10, 
-    Nz = 10,
+    Nx = 32,
+    Ny = 32, 
+    Nz = 32,
     folder = "taylorgreen3D_results",
     max_iter = 1,
     velocity_degree = 2,
@@ -104,6 +104,7 @@ def temporal_hook(u_, p_, tstep, plot_interval, print_dkdt_info, nu,
             
 def theend_hook(dkdtlist, kinlist, Nx, nu, dt, **kw):
     if MPI.rank(mpi_comm_world()) == 0:
+        print kinlist
         import datetime
         now = datetime.datetime.now()
         atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
@@ -118,7 +119,7 @@ def theend_hook(dkdtlist, kinlist, Nx, nu, dt, **kw):
         np.savetxt('/home/guttorm/Desktop/Master/TaylorGreen/ReferenceResults/k_ref%sdt%snu%sN%s.txt' \
             % (atm,dt,nu,Nx), kinlist, delimiter=',')
         np.savetxt('/home/guttorm/Desktop/Master/TaylorGreen/ReferenceResults/dkdt_ref%sdt%snu%sN%s.txt' \
-            % (atm,dt,nu,Nx), kinlist, delimiter=',')
+            % (atm,dt,nu,Nx), dkdtlist, delimiter=',')
 
 
 

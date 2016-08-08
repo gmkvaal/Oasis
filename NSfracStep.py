@@ -137,6 +137,7 @@ if parameters["form_compiler"].has_key("no_ferari") and not solver in ("IPCS", "
 tic()
 stop = False
 total_timer = OasisTimer("Start simulations", True)
+
 while t < (T - tstep*DOLFIN_EPS) and not stop:
     t += dt
     tstep += 1

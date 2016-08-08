@@ -193,6 +193,9 @@ def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, \
 	print "Delta p at t=t0 + 0.5/f)=%.6f" % p_list_short[min_list[-1]]
 	print "Number of timesteps=%.d" % N				
 	
+	plt.plot(p_list_short)
+	plt.show()
+
 	if CFLwrite==True:	
 
 
@@ -207,13 +210,13 @@ def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, \
 				os.system("python ControlMakeMesh.py %s %f %f" % (name, circleres, edgeres))
 				return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/AutoMesh/CFM%s.xml" % name)
 
-		mesh1 = mesh(makemesh=True, name=004, circleres=0.004, edgeres=0.035)
-		mesh2 = mesh(makemesh=True, name=002, circleres=0.002, edgeres=0.035)
-		mesh3 = mesh(makemesh=True, name=001, circleres=0.001, edgeres=0.035)
-		mesh4 = mesh(makemesh=True, name=0005, circleres=0.0005, edgeres=0.035)
-		mesh5 = mesh(makemesh=True, name=00025, circleres=0.00025, edgeres=0.035)
+		mesh1 = mesh(makemesh=True, name=0001, circleres=0.0001, edgeres=0.01)
+		#mesh2 = mesh(makemesh=True, name=002, circleres=0.002, edgeres=0.035)
+		#mesh3 = mesh(makemesh=True, name=001, circleres=0.001, edgeres=0.035)
+		#mesh4 = mesh(makemesh=True, name=0005, circleres=0.0005, edgeres=0.035)
+		#mesh5 = mesh(makemesh=True, name=00025, circleres=0.00025, edgeres=0.035)
 
-		for mesh_ in [mesh1,mesh2,mesh3,mesh4,mesh5]:
+		for mesh_ in [mesh1]:
 			CFL_list = []
 			for dt in [0.001]:
 				print "dt=%.6e" % dt

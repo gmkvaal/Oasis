@@ -7,18 +7,18 @@ from ..NSfracStep import *
 
 # Override some problem specific parameters
 NS_parameters.update(
-    nu = 0.01,
-    T = 4.,
+    nu = 0.001,
+    T = 10.,
     dt = 0.001,
-    Nx = 20, Ny = 20,
+    Nx = 25, Ny = 25,
     folder = "taylorgreen2D_results",
-    plot_interval = 100,
+    plot_interval = 1000000,
     save_step = 10000,
     checkpoint = 10000,
     print_intermediate_info = 1000,
-    compute_error = 1,
+    compute_error = 10,
     use_krylov_solvers = True,
-    velocity_degree = 1,
+    velocity_degree = 2,
     pressure_degree = 1,
     krylov_report = False
 )

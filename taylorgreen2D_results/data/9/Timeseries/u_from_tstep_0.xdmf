@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE Xdmf SYSTEM "Xdmf.dtd" []>
+<Xdmf Version="2.0" xmlns:xi="http://www.w3.org/2001/XInclude">
+  <Domain>
+    <Grid Name="TimeSeries" GridType="Collection" CollectionType="Temporal">
+      <Time TimeType="List">
+        <DataItem Format="XML" Dimensions="1"> 10000</DataItem>
+      </Time>
+      <Grid Name="grid_1" GridType="Uniform">
+        <Topology NumberOfElements="20000" TopologyType="Triangle">
+          <DataItem Format="HDF" Dimensions="20000 3">u_from_tstep_0.h5:/Mesh/0/topology</DataItem>
+        </Topology>
+        <Geometry GeometryType="XY">
+          <DataItem Format="HDF" Dimensions="10201 2">u_from_tstep_0.h5:/Mesh/0/coordinates</DataItem>
+        </Geometry>
+        <Attribute Name="Assigned Vector Function" AttributeType="Vector" Center="Node">
+          <DataItem Format="HDF" Dimensions="10201 3">u_from_tstep_0.h5:/VisualisationVector/0</DataItem>
+        </Attribute>
+      </Grid>
+    </Grid>
+  </Domain>
+</Xdmf>

@@ -24,7 +24,7 @@ NS_parameters.update(
     circleres = 0.2/1,
 	edgeres = 0.2/1,
 	name = "hello",
-	makemesh = False,
+	makemesh = True,
 	resultswrite = False,
 	foldername="TempRes",
 	)
