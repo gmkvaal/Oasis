@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 parameters['allow_extrapolation'] = True
 set_log_active(False)
 from dolfin import *
+import time
+
+time_start = time.clock()
 
 NS_parameters.update(
 	d = 0.1,
@@ -18,20 +21,26 @@ NS_parameters.update(
     #velocity_degree = 2,
     CFLwrite = False,
     key=1,
-    circle = 0.2/1,
-	edge = 0.2/1,
+    circleres = 0.2/1,
+	edgeres = 0.2/1,
 	name = "hello",
-	makemesh = False,
+	makemesh = True,
 	resultswrite = False,
 	foldername="TempRes",
 	)
 
 
-def mesh(makemesh, name, circle, edge, key, **params):
+
+
+def mesh(makemesh, name, circleres, edgeres, key, **params):
+	print ""
+	"----- Resolutions -----"
+	print "edgeres = %.6f, circleRes = %.6f" % (edgeres, circleres)
+	print ""
 	if makemesh == True:
 		import subprocess
 		os.chdir("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/AutoMesh")
-		os.system("python ControlMakeMesh.py %s %f %f" % (name, circle, edge))
+		os.system("python ControlMakeMesh.py %s %f %f" % (name, circleres, edgeres))
 		return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/AutoMesh/CFM%s.xml" % name)
 	else:
 		if key == 1: return Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Coarse/1to16ratio/CM715E.xml")
@@ -89,9 +98,10 @@ def create_bcs(VQ,** NS_namespace):
 
 
 
-def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV,Q, U, d, \
+def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV, Q, U, d, edgeres, circleres, \
 				sys_comp, up_, key, plotit, CFLwrite, resultswrite, foldername, **NS_namespace):
 	 
+	comptime = (time.clock() - time_start)
 	pressure = p_
 	boundary = FacetFunction("size_t", mesh)
 	boundary.set_all(0)
@@ -124,13 +134,13 @@ def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV,Q, U, d, \
 	if plotit == True:
 		uu = project(u_,V)
 		now = datetime.datetime.now()
-		identity = mesh.num_cells()
+		elements = mesh.num_cells()
 		atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
 		if os.path.isdir("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s" % atm):
-			f = File("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s/u_from_CircleStat_E%d.pvd" % (atm,identity))
+			f = File("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s/u_Cstat_Circ%.6fEdge%.4fE%d.pvd" % (atm,circleres,edgeres,elements))
 		else:
 			os.system("mkdir -p /home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s" % atm)
-			f = File("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s/u_from_CircleStat_E%d.pvd" % (atm,identity))
+			f = File("/home/guttorm/Desktop/Master/Oasis/results/data/ResultsRe20%s/u_Cstat_Circ%.6fEdge%.4fE%d.pvd" % (atm,circleres,edgeres,elements))
 		f << uu
 
 	if resultswrite == True:
@@ -141,11 +151,12 @@ def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV,Q, U, d, \
 		identity = mesh.num_cells()
 		text_file = open("/home/guttorm/Desktop/Master/RefinementData/Re20/%s/OutputCircleStationary%d.txt" % (atm,identity), "w")
 		text_file.write("-----Result for %dE-----\n" % identity)
-		text_file.write("h min = %.11f" % mesh.hmin())
+		text_file.write("h min = %.11f \n" % mesh.hmin())
 		text_file.write("Cd max: %.11f \n" % forces[0])
 		text_file.write("Cl max: %.11f \n" % forces[1])
 		text_file.write("Resirculation length: %.11f \n" % (x_c[min_list[-1]] - x_c[min_list[-2]]))
-		text_file.write("Delta P (front-back): %.11f" % (p_(array([0.15,0.20]))- p_(array([0.25,0.20]))))
+		text_file.write("Delta P (front-back): %.11f \n" % (p_(array([0.15,0.20]))- p_(array([0.25,0.20]))))
+		text_file.write("Computational time:: %.5f" % comptime)
 		text_file.close()
 
 
@@ -154,4 +165,5 @@ def theend_hook(mesh, q_, p_, u_,u_components, nu, VQ, V, VV,Q, U, d, \
 	print "Cd = {}, CL = {}".format(*forces)
 	print "Resirculation length:%.11f" % (x_c[min_list[-1]] - x_c[min_list[-2]])
 	print "Delta P (front-back): %.11f" % (p_(array([0.15,0.20]))- p_(array([0.25,0.20])))
+	print "Computational time:: %.5f" % comptime
 	print ""

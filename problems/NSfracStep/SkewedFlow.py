@@ -35,6 +35,7 @@ NS_parameters.update(
 def create_bcs(V, Q, mesh, **NS_namespace):
     # Create inlet profile by solving Poisson equation on boundary
     bmesh = BoundaryMesh(mesh, 'exterior')
+    plot(mesh,interactive=True)
     cc = CellFunction('size_t', bmesh, 0)
     ii = AutoSubDomain(inlet)
     ii.mark(cc, 1)

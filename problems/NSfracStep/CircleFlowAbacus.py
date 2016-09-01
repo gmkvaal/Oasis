@@ -16,8 +16,8 @@ NS_parameters.update(
 	nu = 0.001,
 	T = 8,
 	dt = 0.001,
-    plot_interval = 1000,
-    save_step = 1000,
+    plot_interval = 10000000,
+    save_step = 10000000,
     print_intermediate_info = 100,
     L_list = [],
     D_list = [],
@@ -26,34 +26,34 @@ NS_parameters.update(
     CFLwrite = False,
     resultswrite =False,
     use_krylov_solvers=True,
-    makemesh=True,
-    circleres=0.001,
-    edgeres=0.07,
-    name="AutoMesh"
+    circleres = 0.01,
+    edgeres = 0.035,
+    name = "E01C0001" 	
     )
+
 """
-def mesh(key,**params):
-        if key == 1: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM14969E.xml")
-        if key == 2: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM39883E.xml")
-        if key == 3: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM119197E.xml")
-        if key == 4: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/CFM372949E.xml")
-        if key == 10: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM7169E.xml")
-        if key == 20: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM24927E.xml")
-        if key == 30: return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Refined/Old/CFM94113E.xml")
-"""
-def mesh(makemesh, name, circleres, edgeres, key, **params):
+def mesh(name, circleres, edgeres, **params):
 	print ""
-	"----- Resolutions -----"
+	print "----- Resolutions -----"
 	print "edgeres = %.6f, circleRes = %.6f" % (edgeres, circleres)
 	print ""
 	comm = mpi_comm_world()
         mpiRank = MPI.rank(comm)
 	if mpiRank==0:
-		if makemesh == True:
+
 			import subprocess
 			os.chdir("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh")
 			os.system("python ControlMakeMesh.py %s %f %f" % (name, circleres, edgeres))
 			return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh/CFM%s.xml" % name)
+
+"""
+
+
+
+
+
+def mesh(name, **params):
+	return Mesh("/uio/hume/student-u61/gmkvaal/Master/Mesh/Circle/Coarse/AutoMesh/%s" % name)
 
 class Up(SubDomain):
 	def inside(self, x, on_boundary):
@@ -116,8 +116,8 @@ def create_bcs(V,Q,** NS_namespace):
 				p=[bcq_r])
 
 
-def start_timestep_hook(t, u_, n, ds, **NS_namespace):
-    u_inlet.t = t
+#def start_timestep_hook(t, u_, n, ds, **NS_namespace):
+    #u_inlet.t = t
     #flux = assemble(dot(u_, n)*ds(2))
     #print flux
 
@@ -139,37 +139,69 @@ def pre_solve_hook(mesh, **NS_namespace):
 
 
 
-def temporal_hook(mesh, q_,h, u_, T, nu, dt, L_list, D_list, n, ds,  \
-			      c, U, d, p_list, master, **NS_namespace):
+def temporal_hook(mesh, q_,h, u_, T, nu, dt, t, L_list, D_list, n, ds,  \
+			      c, U, d, p_list, **NS_namespace):
 	pressure = q_['p']
 	tau = -pressure*Identity(2)+nu*(grad(u_)+grad(u_).T)
 	forces = -assemble(dot(dot(tau, n), c)*ds(1)).array()*2/U**2/d
+	#p_list.append(pressure(array([0.15,0.20]))-pressure(array([0.25,0.20])))
+	
+	
+	
+	if MPI.rank(mpi_comm_world()) == 0:  
+		#print pressure(array([0.15,0.20]))-pressure(array([0.25,0.20]))
+		p_list.append(pressure(array([0.15,0.20]))-pressure(array([0.25,0.20])))
+
+
 
 	if len(forces)==2:
-		#comm = mpi_comm_world()
-		#mpiRank = MPI.rank(comm)
-		#master = mpiRank
-		#print master
+		print "time = %.3f" % t
+
 		L_list.append(forces[1])
 		D_list.append(forces[0])
 		p_list.append(pressure(array([0.15,0.20]))-pressure(array([0.25,0.20])))
 		print "Cd = {}, CL = {}".format(*forces)
+		#print pressure(array([0.15,0.20]))-pressure(array([0.25,0.20]))
+	
 
-	#DG = FunctionSpace(mesh, "DG", 0)
-	#CFL = project((dot(u_,u_)**0.5)*dt/h, DG)
-	#print "CFL max %.6f" % max(CFL.vector().array())
-	#return dict(master=master)
+def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, \
+				CFLwrite, resultswrite, key, c, ds, p_list, circleres, edgeres, name, **NS_namespace):
+	
+	
+	if MPI.rank(mpi_comm_world()) == 0:
+		N = len(p_list)
+                Nn = int(9*N/10.)
+                p_list_short = array(p_list[Nn:])
+                max_list = []; min_list = []
+                for j in range(0,(len(p_list_short)-2)):
+                        A = p_list_short[j+2]
+                        B = p_list_short[j+1]
+                        C = p_list_short[j]
+                        if A > 0:
+                                if A < B:
+                                        if B > C:
+                                                max_list.append(list(p_list_short).index(B))
+                        if A < 0:
+                                if A > B:
+                                        if B < C:
+                                                min_list.append(list(p_list_short).index(B))
 
-def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, master, \
-				CFLwrite, resultswrite, key, c, ds, p_list, **NS_namespace):
-		
+
+		print "Delta p at t=t0 + 0.5/f)=%.6f" % p_list_short[min_list[-1]]
+		import datetime
+                now = datetime.datetime.now()
+                atm = "%d.%d.%d" % (now.month, now.day, now.hour)
+                os.system("mkdir -p /uio/hume/student-u61/gmkvaal/Master/RefinementData/Re100/OutputCF%s" % atm)
+                text_file = open("/uio/hume/student-u61/gmkvaal/Master/RefinementData/Re100/OutputCF%s/OutputDeltaP%s.txt" % (atm, name), "w")
+
+
 	if len(L_list) > 1:
 		print "first stage passed"
 		N = len(L_list)
 		Nn = int(9*N/10.)
 		L_list_short = array(L_list[Nn:])
 		D_list_short = array(D_list[Nn:])
-		p_list_short = array(p_list[Nn:])
+		#p_list_short = array(p_list[Nn:])
 		max_list = []; min_list = []
 		for j in range(0,(len(L_list_short)-2)):
 			A = L_list_short[j+2]
@@ -183,54 +215,32 @@ def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, master, \
 				if A > B:
 					if B < C:
 						min_list.append(list(L_list_short).index(B))
-	
+		
+		print max_list[-1]
+		print max_list[-2]
 		f = d/(U*dt*(max_list[-1]-max_list[-2]))		# Strouhal number				
 		
-
-		def CFLfinder(u_,**NS_namespace):
-			mesh1 = Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM14969E.xml")
-			mesh2 = Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM39883E.xml")
-			mesh3 = Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM119197E.xml")
-			mesh4 = Mesh("/home/guttorm/Desktop/Master/Mesh/Circle/Refined/CFM372949E.xml")
-			CFL_list = []
-			for dt in [0.001,0.0005,0.0001,0.00005,0.000015]:
-				print "dt=%.6e" % dt
-				for mesh in [mesh1,mesh2,mesh3,mesh4]:
-					h = CellSize(mesh)
-					DG = FunctionSpace(mesh, "DG", 0)
-					CFL = project((dot(u_,u_)**0.5)*dt/h, DG)
-					print "CFL max %.6f" % max(CFL.vector().array())
-					CFL_list.append(max(CFL.vector().array()))
-				text_file = open("/home/guttorm/Desktop/Master/CFL/CFLres/CFLnumbersNew%8f.txt" %dt, "w")
-				text_file.write("dt: %.6e \n" % dt)
-				for ii in CFL_list:
-					text_file.write("CFL max %.8f \n" % ii)
-
-				CFL_list = []
 		
 		if CFLwrite==True:
 			CFLfinder(u_,**NS_namespace)
 
-		def writefile(**NS_namespace):
+		if resultswrite==True:
+			
 			import datetime
 			now = datetime.datetime.now()
-			atm = "%d.%d.%d.%d" % (now.year, now.month, now.day, now.hour)
-			os.system("mkdir -p /uio/hume/student-u61/gmkvaal/Master/RefinementData/Re100/OutputCF%s" % atm)
-			text_file = open("/uio/hume/student-u61/gmkvaal/Master/RefinementData/Re100/OutputCF%s/OutputCircleTest%d.txt" % (atm, key), "w")
+			atm = "%d.%d.%d" % (now.month, now.day, now.hour)
+			
+			#os.system("mkdir -p /uio/hume/student-u61/gmkvaal/Master/RefinementData/Re100/OutputCF%s" % atm)
+			text_file = open("/uio/hume/student-u61/gmkvaal/Master/RefinementData/Re100/OutputCF%s/OutputCircle%s.txt" % (atm, name), "w")
 			text_file.write("Cl max: %.8f \n" % max(L_list_short))
 			text_file.write("Cd max: %.8f \n" % max(D_list_short))
 			text_file.write("Cl min: %.8f \n" % min(L_list_short))
 			text_file.write("Cd min: %.8f \n" % min(D_list_short))
-			text_file.write("St = %.8f") % f
-			text_file.write("Delta P = %.8f") % p_list_short[min_list[-1]]
+			text_file.write("St = %.8f" % f)
+			text_file.write("Delta P = %.8f" % p_list_short[min_list[-1]])
 			text_file.close()
 
-		
-		if resultswrite==True:	
-			writefile(**NS_namespace)
-
-		print "----------Results----------"
-		print "Cl max=%.6f" % max(L_list_short)
+		print "----------Results--------"
 		print "Cd max=%.6f" % max(D_list_short)
 		print "Cl min=%.6f" % min(L_list_short)
 		print "Cd min=%.6f" % min(D_list_short)
@@ -238,8 +248,7 @@ def theend_hook(V, Q, U, d, h, q_, mesh, n, L_list, D_list, T, dt, u_, master, \
 		print "Delta p at t=t0 + 0.5/f)=%.6f" % p_list_short[min_list[-1]]
 		print "Number of timesteps=%.d" % N
 
-		if resultswrite==True:
-                        writefile(**NS_namespace)
+		
 
 
-	else:		print "No information on this process"
+	else:	print "No information on this process"
